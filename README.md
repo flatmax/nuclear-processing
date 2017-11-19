@@ -7,7 +7,7 @@ Lockless, ordered, threaded, parallel chain reaction processing.
 A processing methodology where one process triggers many different processes to start. It can be set up like a chain reaction,
 where multiple processes can trigger multiple subsequent processes.
 
-In the contect of this project, loop fission computation has the following properties :
+In the context of this project, fission processing has the following properties :
 * lockless 
 * parallel
 * ordered
@@ -16,7 +16,7 @@ In the contect of this project, loop fission computation has the following prope
 
 ## How can I think of it ?
 
-Think of a chain reaction explosion where Uranium 235 triggers many other uranium atoms to split. One path of fission is not dependent on another path, however points of dependance can be specified.
+Think of a chain reaction explosion where Uranium 235 triggers many other uranium atoms to split. One path of fission is dependent on only only prior computations in the fission chain. Computation is independent of other fission chains.
 
 
 ## A history of loop fission computation
