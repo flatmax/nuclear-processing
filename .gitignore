@@ -31,3 +31,13 @@ Makefile.in
 # http://www.gnu.org/software/texinfo
 
 /texinfo.tex
+
+*~
+api/html
+Makefile
+*.stamp
+libtool
+m4
+config.status
+config.log
+config.h
