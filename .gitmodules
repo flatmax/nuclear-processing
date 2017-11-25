@@ -1,0 +1,3 @@
+[submodule "gtkiostream"]
+	path = gtkiostream
+	url = https://github.com/flatmax/gtkiostream.git
