@@ -26,15 +26,19 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef ATOM_H_
-#define ATOM_H_
+#ifndef NEUTRON_H_
+#define NEUTRON_H_
 
-/** The atom is the basic unit of computation. Atoms are replicated into a crystal
-layer \see LatticeLayer.
+/** The Neutron travels between atoms, initiating processing by copying data.
 */
-class Atom : public Nucleus {
+class Neutron {
 public:
-  virtual ~Atom(){}''
+  virtual ~Nucleus(){}''
+
+  /** Copy the data to the next atom.
+  \return <0 on error
+  */
+  virtual int copy()=0
 };
 
-#endif // ATOM_H_
+#endif // NEUTRON_H_
