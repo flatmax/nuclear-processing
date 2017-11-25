@@ -18,7 +18,11 @@ In the context of this project, fission processing has the following properties 
 
 Think of a chain reaction explosion where Uranium 235 triggers many other uranium atoms to split. One path of fission is dependent on only only prior computations in the fission chain. Computation is independent of other fission chains.
 
+<<<<<<< HEAD
 It is comprised of the following elements, where atoms are combined into a crystalline structure. One crystal lattice layer is synchronised to start computation at the same time. The atom's nucleus performs the computation and the neutrons ejected during fission transfer data between atoms.
+=======
+It is comprised of the following
+>>>>>>> 5258d45e32bf4511dca735c5f3e3ebc4673ccbff
 
 ### LatticeLayer - the latice layer made of atoms (or ions) which are synchronised
 
