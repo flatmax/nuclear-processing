@@ -26,15 +26,20 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef ATOM_H_
-#define ATOM_H_
+#ifndef NUCLEUS_H_
+#define NUCLEUS_H_
 
-/** The atom is the basic unit of computation. Atoms are replicated into a crystal
-layer \see LatticeLayer.
+/** The Nucleus of the atom does the processing. It ejects Neutrons to take data
+to other atoms and make them explode (compute).
 */
-class Atom : public Nucleus {
+class Nucleus : public Neutron {
 public:
-  virtual ~Atom(){}''
+  virtual ~Nucleus(){}''
+
+  /** Process the data.
+  \return <0 on error
+  */
+  virtual int process()=0;
 };
 
-#endif // ATOM_H_
+#endif // NUCLEUS_H_
