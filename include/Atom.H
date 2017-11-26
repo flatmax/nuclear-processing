@@ -29,12 +29,72 @@
 #ifndef ATOM_H_
 #define ATOM_H_
 
-/** The atom is the basic unit of computation. Atoms are replicated into a crystal
-layer \see LatticeLayer.
+#include <Thread.H>
+#include <Futex.H>
+
+/** The atom is the basic unit of computation. The Atom inherits a
+<a href="http://gtkiostream.flatmax.org/classFutex.html">Futex</a> for waking
+other atoms down the chain reaction after computing. The Atom inherits a
+<a href="http://gtkiostream.flatmax.org/classThreadedMethod.html">ThreadedMethod</a>
+to run the private threadMain method, which calls your process method from your
+inheriting class. The implementation would look something like this :
+
+\code{.cpp}
+class ComputeSomething : public Atom {
+
+  // this is an example of your output data
+  double data[1024];
+
+  int process(){
+    // First copy the data from chainAtom over here
+    for (int i...)
+      data[i]=chainAtom->data[i];
+    // Now process the data
+    for (int i...)
+      data[i]=yourProcessingFunction(data[i]);
+
+    // The previous two loops could be combined into one loop like so :
+    for (int i...)
+      data[i]=yourProcessingFunction(chainAtom->data[i]);
+
+    // Perhaps you need to do something different for data copying and processing ?
+    // This process method is where you do it.
+  }
+}
+\endcode
 */
-class Atom : public Nucleus {
+class Atom : public Futex, public ThreadedMethod {
+  /** In this processing thread, wait for the prior atom to complete,
+  then execute our process here.
+  This thread will cease to execute if either the chainAtom is (or becomes) NULL
+  or if the process method returns a value <0.
+  \return NULL on exit.
+  */
+  void *threadMain(void){
+    while (true){
+      if (!chainAtom) // if we have no Atom defined prior to us, then exit.
+        break;
+      chainAtom->wait(); // Wait for the prior atom to fin. processing
+      if (process()<0) // process
+        break;
+      wakeAll(); // Wake all of the Atoms waiting on this process to complete.
+    }
+    return NULL;
+  }
+
+protected:
+  Atom *chainAtom; ///< The prior atom in the chain reaction
+
 public:
-  virtual ~Atom(){}''
+  virtual ~Atom(){} ///< Destructor
+
+  /** Process the data.
+  Here you implement your process method which copies data as required from the
+  chainAtom. Once you have finished computing, return <0 on error, >=0 otherwise
+
+  \return <0 on error
+  */
+  virtual int process()=0;
 };
 
 #endif // ATOM_H_

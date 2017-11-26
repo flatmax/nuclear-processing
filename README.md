@@ -18,23 +18,11 @@ In the context of this project, fission processing has the following properties 
 
 Think of a chain reaction explosion where Uranium 235 triggers many other uranium atoms to split. One path of fission is dependent on only only prior computations in the fission chain. Computation is independent of other fission chains.
 
-It is comprised of the following elements, where atoms are combined into a crystalline structure. One crystal lattice layer is synchronised to start computation at the same time. The atom's nucleus performs the computation and the neutrons ejected during fission transfer data between atoms.
+Each Atom waits for the prior atom in the chain reaction (the chain atom) to complete processing and signal it's completion. The Atom then
+executes the process which most likely begins with a memory copy and then computation if necessary. On completion, it signals the next atoms
+up the chain to begin processing.
 
-### LatticeLayer - the latice layer made of atoms (or ions) which are synchronised
-
-The LatticeLayer holds a group of atoms (computational units). The atoms are synchronised to start computation at the same time. This is accomplished by waiting on a Futex.
-
-### Atom - the computational unit
-
-The Atom inherits the Nucleus
-
-### Nucleus - performs the computation
-
-The Nucleus performs the computation.
-
-### Neutron - the messenger
-
-The Neutron is the messenger, it performs the data transfer between atoms.
+The Atom uses a ThreadedMethod for performing the wait, process and wake loop. A Futex is used for waiting and waking.
 
 ## A history of loop fission computation
 
