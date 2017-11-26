@@ -42,3 +42,10 @@ config.status
 config.log
 config.h
 Doxyfile
+*.Plo
+*.a
+*.la
+*.lai
+*.so
+*.o
+*.lo

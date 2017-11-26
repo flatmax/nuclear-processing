@@ -26,9 +26,12 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-AUTOMAKE_OPTIONS = foreign subdir-objects
-SUBDIRS = api ALSAExample
+if HAVE_ALSA
+if HAVE_EIGEN
+pkglib_LTLIBRARIES = libasound_module_pcm_NeutronBombALSAExtPluginTest.la
+endif
+endif
 
-ACLOCAL_AMFLAGS = -I m4
-
-EXTRA_DIST = README.md LICENSE.txt
+libasound_module_pcm_NeutronBombALSAExtPluginTest_la_SOURCES = NeutronBombALSAExtPluginTest.C
+libasound_module_pcm_NeutronBombALSAExtPluginTest_la_CPPFLAGS = -I$(top_srcdir)/gtkiostream/include $(EIGEN_CFLAGS)
+libasound_module_pcm_NeutronBombALSAExtPluginTest_la_LDFLAGS = -module -avoid-version -export-dynamic -no-undefined

@@ -33,6 +33,8 @@ m4_define([neutron_bomb_processing_version], [neutron_bomb_processing_current_ve
 AC_INIT( neutron_bomb_processing, [neutron_bomb_processing_version], [ https://github.com/flatmax/neutron_bomb_processing/issues ])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([include/Atom.H])
+AC_CONFIG_SRCDIR([gtkiostream/include/Futex.H])
+AC_CONFIG_SRCDIR([gtkiostream/include/Thread.H])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PREFIX_DEFAULT(/usr)
@@ -58,8 +60,32 @@ fi
 AM_CONDITIONAL([HAVE_DOXYGEN],[test -n "$DOXYGEN"])
 AM_COND_IF([HAVE_DOXYGEN], [AC_CONFIG_FILES([api/Doxyfile])])
 
+# eigen3
+PKG_CHECK_MODULES(EIGEN, eigen3 >= 3.0.0, HAVE_EIGEN="yes", HAVE_EIGEN="no")
+AC_SUBST(EIGEN_CFLAGS)
+AC_SUBST(EIGEN_LIBS)
+AM_CONDITIONAL(HAVE_EIGEN, test x$HAVE_EIGEN = xyes)
+if test "x$HAVE_EIGEN" == xyes ; then
+    AC_DEFINE(HAVE_EIGEN, [], [whether to build in Eigen support])
+fi
+
+# ALSA
+PKG_CHECK_MODULES(ALSA, alsa, HAVE_ALSA="yes", HAVE_ALSA="no")
+AC_SUBST(ALSA_CFLAGS)
+AC_SUBST(ALSA_LIBS)
+AM_CONDITIONAL(HAVE_ALSA, test x$HAVE_ALSA = xyes)
+if test "x$HAVE_ALSA" == xyes ; then
+    AC_DEFINE(HAVE_ALSA, [], [whether to build in Alsa support])
+fi
+
 AC_C_INLINE
 AC_FUNC_ERROR_AT_LINE
 
-AC_CONFIG_FILES([Makefile api/Makefile])
+AC_CONFIG_FILES([Makefile api/Makefile ALSAExample/Makefile])
 AC_OUTPUT
+
+AM_COND_IF(HAVE_EIGEN, [AC_MSG_NOTICE([Eigen   ....................................... Present])], [AC_MSG_NOTICE([Eigen   ......................................... Not present
+Eigen tests and applications will not be built.])])
+
+AM_COND_IF(HAVE_ALSA, [AC_MSG_NOTICE([Alsa   ....................................... Present])], [AC_MSG_NOTICE([Alsa   ......................................... Not present
+Alsa tests and applications will not be built.])])
