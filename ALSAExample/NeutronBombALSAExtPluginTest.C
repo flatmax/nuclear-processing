@@ -30,9 +30,54 @@
 using namespace std;
 using namespace ALSA;
 
+#include "AtomALSA.H"
+
+/** This class uses neutron-bomb-processing to execute lattice by lattice in parallel threads.
+The implementation uses the AtomALSA and AtomALSAOut classes, but is more elaborate then required.
+The extra elaboration shows how to chain multiple atom lattices (layers) together.
+
+The processing is very simple. The input lattice (atom layer) is chained to one start trigger
+atom. Once we trigger this atom, it triggers all of the input lattice to process.
+The input lattice does nothing but receives the input ALSA audio data.
+The input lattice triggers the output lattice, which copies the data received from the input
+lattice over to the ALSA output audio buffer.
+In this way, an elaborate method for copying the input ALSA audio data directly
+to the ALSA output audio is performed through two lattices (atom layers).
+
+Other implementations can implement signal processing in each of their layer's Atom::process methods to
+do something more significant in a signal processing chain reaction !
+
+The ::init method sets up the neutron-bomb-processing system.
+It resizes the input and output atom lattices (layers) to match the input and output (slave)
+channels counts.
+It chains all of the atoms in the input lattice to the startTrigger atom.
+It chains each output atom to a single input atom and sets its channels number.
+It then starts the thread for all relevant input and output lattices.
+
+The Futex of one Atom (the startTrigger) triggers the inChannels lattice to process.
+Upon completion of the iChannels, the outChannels a triggered to execute.
+The inChannels do nothing ! But their process methods could implement some form of processing.
+The ALSA in data is copied directly to the inChannels during setup in the transfer method.
+The outChannels are mapped to the inChannels as a wait and input data path. The outChannels
+also have a pointer to the ALSA out data mapped matrix. This allows them to process
+and copy the result over to the ALSA output data buffer.
+The entire process is like so :
+* ::transfer performs the following
+* - Firstly :
+* -- Zeros the output buffer
+* -- copies the input audio data to the inChannels[] channel
+* -- points the outChannels to the ALSA out audio matrix
+*
+* - Secondly :
+* -- wakes the startTrigger atom, which performs an process then wakes all atoms in the waiting lattice (layer)
+*/
 class NeutronBombALSAExtPluginTest : public ALSAExternalPlugin {
 		snd_pcm_format_t inFormat;
 		snd_pcm_format_t outFormat;
+
+		vector<AtomALSA> inChannels; ///< The input data lattice
+		vector<AtomALSAOut> outChannels; ///< The output data lattice
+		AtomALSA startTrigger; ///< This atom triggers the input lattice
 
 public:
 	NeutronBombALSAExtPluginTest(){
@@ -40,9 +85,9 @@ public:
 		setName("NeutronBombALSAExtPluginTest");
 	}
 
-	virtual ~NeutronBombALSAExtPluginTest(){
-    	std::cout<<__func__<<std::endl;
-	}
+	// virtual ~NeutronBombALSAExtPluginTest(){
+  //   	std::cout<<__func__<<std::endl;
+	// }
 
 	virtual int specifyHWParams(){
 		int ret;
@@ -53,10 +98,8 @@ public:
 
 		outFormat=SND_PCM_FORMAT_FLOAT_LE;
 		ret=snd_pcm_extplug_set_slave_param(&extplug, SND_PCM_EXTPLUG_HW_FORMAT, outFormat);
-		cout<<ret<<endl;
 		inFormat=SND_PCM_FORMAT_FLOAT_LE;
 		ret=snd_pcm_extplug_set_param(&extplug, SND_PCM_EXTPLUG_HW_FORMAT, inFormat);
-		cout<<ret<<endl;
 
 		return 0;
 	}
@@ -69,7 +112,36 @@ public:
 		cout<<"extplug.slave_channels "<<extplug.slave_channels<<endl;
 		cout<<"format "<<ALSA::Hardware::formatDescription(extplug.format)<<endl;
 		cout<<"slave format "<<ALSA::Hardware::formatDescription(extplug.slave_format)<<endl;
-    return 0;
+
+		// set the correct channels numbers - this resizes the input and output
+		// lattice of atoms to equal the channel numbers
+		inChannels.resize(extplug.channels);
+		outChannels.resize(extplug.slave_channels);
+
+		// chain input to output atoms, according to the minimum number.
+		for (int i=0;i<::min(extplug.channels, extplug.slave_channels);i++){
+			inChannels[i].setChainAtom(&startTrigger); // the input lattice is triggered from one atom's Futex
+			inChannels[i].resize(getPeriodSize(), 1);
+			outChannels[i].setChainAtom(&inChannels[i]);
+			outChannels[i].setChannel(i);
+			outChannels[i].resize(getPeriodSize(), 1);
+		}
+
+		// create/run threads, guarding against failure
+		int ret=0;
+		for (int i=0;i<::min(extplug.channels, extplug.slave_channels);i++){
+			ret=inChannels[i].run();
+			if (!ret)
+				ret=outChannels[i].run();
+			if (ret)
+				break;
+		}
+	  if (ret) // if any threads didn't create successfully, stop all threads
+			for (int i=0;i<::min(extplug.channels, extplug.slave_channels);i++){
+				inChannels[i].stop();
+				outChannels[i].stop();
+			}
+    return ret;
   }
 
 	virtual snd_pcm_sframes_t transfer(const snd_pcm_channel_area_t *dst_areas, snd_pcm_uframes_t dst_offset, const snd_pcm_channel_area_t *src_areas, snd_pcm_uframes_t src_offset, snd_pcm_uframes_t size){
@@ -83,9 +155,21 @@ public:
 		Eigen::Map<Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic>, Eigen::Unaligned, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic> >
 																						out(dstAddr, size, slaveCh, strideSlave);
 
+		// printf("\ntransfer : in rows=%ld cols=%ld\n", in.rows(), in.cols());
+		// printf("\ntransfer : out rows=%ld cols=%ld\n", out.rows(), out.cols());
+		// printf("\n\ntransfer %f\n",in.col(0).maxCoeff());
+
+		// initial setup
     out.setZero();
     ch=::min(ch, slaveCh); // copy only the smallest channel count over
-		out.block(0,0,out.rows(),ch)=in.block(0,0,in.rows(),ch);
+		for (int i=0; i<ch; i++){
+			inChannels[i].col(0)=in.col(i); // copy the input over to the first layer (here as its output)
+			outChannels[i].assignOutParam(dstAddr, size, slaveCh);
+		}
+
+		// begin execution
+		startTrigger.wakeAll();
+		// sleep(0.03);
   	return size;
 	}
 };
