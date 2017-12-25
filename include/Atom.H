@@ -86,7 +86,14 @@ protected:
   Atom *chainAtom; ///< The prior atom in the chain reaction
 
 public:
-  virtual ~Atom(){} ///< Destructor
+  /** Constructor
+  We start with a NULL chainAtom
+  */
+  Atom(){
+    chainAtom=NULL;
+  }
+
+  // virtual ~Atom(){} ///< Destructor
 
   /** Process the data.
   Here you implement your process method which copies data as required from the
@@ -95,6 +102,13 @@ public:
   \return <0 on error
   */
   virtual int process()=0;
+
+  /** Add the chain atom - this is the atom which we wait on
+  \param atom The atom we are waiting on
+  */
+  void setChainAtom(Atom *atom){
+    chainAtom=atom;
+  }
 };
 
 #endif // ATOM_H_
