@@ -1,8 +1,9 @@
 # nuclear-processing
 Fission|Fusion
 --- | --- 
-Lockless, ordered, threaded, parallel chain reaction processing.
 ![Chain reaction - fission](https://upload.wikimedia.org/wikipedia/commons/f/f0/Nuclear_fission_chain_reaction.svg "fission chain reaction") | ![Chain reaction - fusion](https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Fusion_in_the_Sun.svg/421px-Fusion_in_the_Sun.svg.png "fusion chain reaction")
+
+Lockless, ordered, threaded, parallel chain reaction processing.
 
 ## What is nuclear processing ?
 
