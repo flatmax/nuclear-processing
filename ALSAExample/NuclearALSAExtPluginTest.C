@@ -78,14 +78,14 @@ The entire process is like so :
 * -- The Fusion processes waits for all output processing to complete before passing the processing thread back to the ALSA kernel subsystem.
 */
 class NuclearALSAExtPluginTest : public ALSAExternalPlugin {
-		vector<NuclearALSA> inChannels; ///< The input data lattice
-		vector<NuclearALSAOut> outChannels; ///< The output data lattice
-		NuclearALSA startTrigger; ///< This atom triggers the input lattice
-		FuseALSA waitTrigger; ///< Wait for all outputs to finish with this Fusion process
+	vector<NuclearALSA> inChannels; ///< The input data lattice
+	vector<NuclearALSAOut> outChannels; ///< The output data lattice
+	NuclearALSA startTrigger; ///< This atom triggers the input lattice
+	FuseALSA waitTrigger; ///< Wait for all outputs to finish with this Fusion process
 
 public:
 	NuclearALSAExtPluginTest(){
-  	std::cout<<__func__<<std::endl;
+		std::cout<<__func__<<std::endl;
 		setName("NuclearALSAExtPluginTest");
 	}
 
@@ -102,7 +102,7 @@ public:
 		return 0;
 	}
 
-  virtual int init(){
+	virtual int init(){
 		cout<<__func__<<endl;
 		cout<<"period size "<<getPeriodSize()<<endl;
 		cout<<"extplug.rate "<<extplug.rate<<endl;
@@ -131,25 +131,25 @@ public:
 		for (int i=0;i<::min(extplug.channels, extplug.slave_channels);i++){
 			ret=inChannels[i].run();
 			if (!ret)
-				ret=outChannels[i].run();
+			ret=outChannels[i].run();
 			if (ret)
-				break;
+			break;
 		}
-	  if (ret) // if any threads didn't create successfully, stop all threads
+		if (ret) // if any threads didn't create successfully, stop all threads
 			for (int i=0;i<::min(extplug.channels, extplug.slave_channels);i++){
 				inChannels[i].stop();
 				outChannels[i].stop();
 			}
-    return ret;
-  }
+		return ret;
+	}
 
 	virtual snd_pcm_sframes_t transfer(const snd_pcm_channel_area_t *dst_areas, snd_pcm_uframes_t dst_offset, const snd_pcm_channel_area_t *src_areas, snd_pcm_uframes_t src_offset, snd_pcm_uframes_t size){
 		int ch=extplug.channels, slaveCh=extplug.slave_channels;
-    Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic> stride(1,ch);
+		Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic> stride(1,ch);
 		float *srcAddr=(float*)getAddress(src_areas, src_offset);
 		float *dstAddr=(float*)getAddress(dst_areas, dst_offset);
 		Eigen::Map<Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic>, Eigen::Unaligned, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic> >
-																						in(srcAddr, size, ch, stride);
+											in(srcAddr, size, ch, stride);
 
 		// initial setup
 		ch=::min(ch, slaveCh); // copy only the smallest channel count over
@@ -162,14 +162,14 @@ public:
 		// begin execution
 		startTrigger.wakeAll();
 		waitTrigger.waitFused(); // Wait for all output processes to fuse
-  	return size;
+		return size;
 	}
 };
 
 NuclearALSAExtPluginTest nBEPlugin;
 extern "C" SND_PCM_PLUGIN_DEFINE_FUNC(NuclearALSAExtPluginTest){
 	std::cout<<__func__<<std::endl;
-  nBEPlugin.parseConfig(name, conf, stream, mode);
+	nBEPlugin.parseConfig(name, conf, stream, mode);
 
 	int ret=nBEPlugin.create(name, root, stream, mode);
 	if (ret<0)
@@ -179,7 +179,7 @@ extern "C" SND_PCM_PLUGIN_DEFINE_FUNC(NuclearALSAExtPluginTest){
 
 	*pcmp=nBEPlugin.getPCM();
 	std::cout<<__func__<<" returning "<<std::endl;
-    return 0;
+	return 0;
 }
 
 SND_PCM_PLUGIN_SYMBOL(NuclearALSAExtPluginTest);

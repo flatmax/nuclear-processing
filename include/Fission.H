@@ -61,6 +61,8 @@ class ComputeSomething : public Fission {
 
     // Perhaps you need to do something different for data copying and processing ?
     // This process method is where you do it.
+
+    return 0;
   }
 }
 \endcode
