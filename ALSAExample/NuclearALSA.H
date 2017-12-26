@@ -40,8 +40,6 @@ class NuclearALSA : public Fission, public Eigen::Matrix<float, Eigen::Dynamic, 
   placed into the output Eigen column by a different thread.
   */
   virtual int process(){
-    // printf("NuclearALSA::process : rows in =%ld cols in =%ld\n",this->rows(), this->cols());
-    // printf("%f\n",maxCoeff());
     return 0;
   }
 };
@@ -54,8 +52,8 @@ class NuclearALSAOut : public NuclearALSA {
   unsigned int ch; ///< The channel in the out matrix
   unsigned int chCnt; ///< The slave's channel count
 
-  float *dstAddr;
-  snd_pcm_uframes_t size;
+  float *dstAddr; ///< Points to the start of the ALSA output buffer
+  snd_pcm_uframes_t size; ///< The size of the ALSA output buffer
 
   /** This output layer simply copies memory across to the ALSA memory buffer
   \return 0

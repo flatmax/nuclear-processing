@@ -32,7 +32,7 @@ using namespace ALSA;
 
 #include "NuclearALSA.H"
 
-/** This class uses neutron-bomb-processing to execute lattice by lattice in parallel threads.
+/** This class uses nuclear-processing to execute lattice by lattice in parallel threads.
 The implementation uses the NuclearALSA and NuclearALSAOut classes, but is more elaborate then required.
 The extra elaboration shows how to chain multiple atom lattices (layers) together.
 
@@ -43,6 +43,9 @@ The input lattice triggers the output lattice, which copies the data received fr
 lattice over to the ALSA output audio buffer.
 In this way, an elaborate method for copying the input ALSA audio data directly
 to the ALSA output audio is performed through two lattices (atom layers).
+
+One last fusion setp ensures that all output layer atomic processes are complete
+before returning the processing thread to the ALSA Kernel subsystem.
 
 Other implementations can implement signal processing in each of their layer's Fission::process methods to
 do something more significant in a signal processing chain reaction !
@@ -55,7 +58,7 @@ It chains each output atom to a single input atom and sets its channels number.
 It then starts the thread for all relevant input and output lattices.
 
 The Futex of one Fission (the startTrigger) triggers the inChannels lattice to process.
-Upon completion of the iChannels, the outChannels a triggered to execute.
+Upon completion of the inChannels, the outChannels a triggered to execute.
 The inChannels do nothing ! But their process methods could implement some form of processing.
 The ALSA in data is copied directly to the inChannels during setup in the transfer method.
 The outChannels are mapped to the inChannels as a wait and input data path. The outChannels
@@ -70,11 +73,11 @@ The entire process is like so :
 *
 * - Secondly :
 * -- wakes the startTrigger atom, which performs an process then wakes all atoms in the waiting lattice (layer)
+*
+* - Thirdly :
+* -- The Fusion processes waits for all output processing to complete before passing the processing thread back to the ALSA kernel subsystem.
 */
 class NuclearALSAExtPluginTest : public ALSAExternalPlugin {
-		snd_pcm_format_t inFormat;
-		snd_pcm_format_t outFormat;
-
 		vector<NuclearALSA> inChannels; ///< The input data lattice
 		vector<NuclearALSAOut> outChannels; ///< The output data lattice
 		NuclearALSA startTrigger; ///< This atom triggers the input lattice
@@ -82,7 +85,7 @@ class NuclearALSAExtPluginTest : public ALSAExternalPlugin {
 
 public:
 	NuclearALSAExtPluginTest(){
-    	std::cout<<__func__<<std::endl;
+  	std::cout<<__func__<<std::endl;
 		setName("NuclearALSAExtPluginTest");
 	}
 
@@ -93,10 +96,8 @@ public:
 		cout<<Hardware::formatDescription(extplug.format)<<endl;
 		cout<<Hardware::formatDescription(extplug.slave_format)<<endl;
 
-		outFormat=SND_PCM_FORMAT_FLOAT_LE;
-		ret=snd_pcm_extplug_set_slave_param(&extplug, SND_PCM_EXTPLUG_HW_FORMAT, outFormat);
-		inFormat=SND_PCM_FORMAT_FLOAT_LE;
-		ret=snd_pcm_extplug_set_param(&extplug, SND_PCM_EXTPLUG_HW_FORMAT, inFormat);
+		ret=snd_pcm_extplug_set_slave_param(&extplug, SND_PCM_EXTPLUG_HW_FORMAT, SND_PCM_FORMAT_FLOAT_LE);
+		ret=snd_pcm_extplug_set_param(&extplug, SND_PCM_EXTPLUG_HW_FORMAT, SND_PCM_FORMAT_FLOAT_LE);
 
 		return 0;
 	}
@@ -145,18 +146,14 @@ public:
 	virtual snd_pcm_sframes_t transfer(const snd_pcm_channel_area_t *dst_areas, snd_pcm_uframes_t dst_offset, const snd_pcm_channel_area_t *src_areas, snd_pcm_uframes_t src_offset, snd_pcm_uframes_t size){
 		int ch=extplug.channels, slaveCh=extplug.slave_channels;
     Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic> stride(1,ch);
-    Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic> strideSlave(1,ch);
 		float *srcAddr=(float*)getAddress(src_areas, src_offset);
 		float *dstAddr=(float*)getAddress(dst_areas, dst_offset);
 		Eigen::Map<Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic>, Eigen::Unaligned, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic> >
 																						in(srcAddr, size, ch, stride);
-		Eigen::Map<Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic>, Eigen::Unaligned, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic> >
-																						out(dstAddr, size, slaveCh, strideSlave);
 
 		// initial setup
-		waitTrigger.setFusionAtomCount(::min(extplug.channels, extplug.slave_channels)); // we will only process this many channels
-    out.setZero();
-    ch=::min(ch, slaveCh); // copy only the smallest channel count over
+		ch=::min(ch, slaveCh); // copy only the smallest channel count over
+		waitTrigger.setFusionAtomCount(ch); // we will only process this many channels
 		for (int i=0; i<ch; i++){
 			inChannels[i].col(0)=in.col(i); // copy the input over to the first layer (here as its output)
 			outChannels[i].assignOutParam(dstAddr, size, slaveCh);
@@ -172,7 +169,7 @@ public:
 NuclearALSAExtPluginTest nBEPlugin;
 extern "C" SND_PCM_PLUGIN_DEFINE_FUNC(NuclearALSAExtPluginTest){
 	std::cout<<__func__<<std::endl;
-    nBEPlugin.parseConfig(name, conf, stream, mode);
+  nBEPlugin.parseConfig(name, conf, stream, mode);
 
 	int ret=nBEPlugin.create(name, root, stream, mode);
 	if (ret<0)
