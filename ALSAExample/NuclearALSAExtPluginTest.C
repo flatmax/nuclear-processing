@@ -50,7 +50,7 @@ before returning the processing thread to the ALSA Kernel subsystem.
 Other implementations can implement signal processing in each of their layer's Fission::process methods to
 do something more significant in a signal processing chain reaction !
 
-The ::init method sets up the neutron-bomb-processing system.
+The ::init method sets up the nuclear-processing system.
 It resizes the input and output atom lattices (layers) to match the input and output (slave)
 channels counts.
 It chains all of the atoms in the input lattice to the startTrigger atom.

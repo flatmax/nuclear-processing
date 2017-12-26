@@ -25,12 +25,12 @@
 # THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-m4_define([neutron_bomb_processing_current_version], [0]) # ++ if API added (age++), removed, or changed (age=0)
-m4_define([neutron_bomb_processing_revision_version], [0]) # ++ if API same but src code change
-m4_define([neutron_bomb_processing_age_version], [0]) # ++ if API added since last release, if API removed or changed then age=0
-m4_define([neutron_bomb_processing_version], [neutron_bomb_processing_current_version.neutron_bomb_processing_revision_version.neutron_bomb_processing_age_version])
+m4_define([nuclear_processing_current_version], [0]) # ++ if API added (age++), removed, or changed (age=0)
+m4_define([nuclear_processing_revision_version], [0]) # ++ if API same but src code change
+m4_define([nuclear_processing_age_version], [0]) # ++ if API added since last release, if API removed or changed then age=0
+m4_define([nuclear_processing_version], [nuclear_processing_current_version.nuclear_processing_revision_version.nuclear_processing_age_version])
 
-AC_INIT( neutron_bomb_processing, [neutron_bomb_processing_version], [ https://github.com/flatmax/neutron_bomb_processing/issues ])
+AC_INIT( nuclear_processing, [nuclear_processing_version], [ https://github.com/flatmax/nuclear_processing/issues ])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([include/Fission.H])
 AC_CONFIG_SRCDIR([gtkiostream/include/Futex.H])
@@ -40,8 +40,8 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_PREFIX_DEFAULT(/usr)
 
 LT_INIT
-AC_SUBST(LT_RELEASE, [neutron_bomb_processing_version])
-AC_SUBST(LT_CURRENT, [neutron_bomb_processing_current_version:neutron_bomb_processing_revision_version:neutron_bomb_processing_age_version])
+AC_SUBST(LT_RELEASE, [nuclear_processing_version])
+AC_SUBST(LT_CURRENT, [nuclear_processing_current_version:nuclear_processing_revision_version:nuclear_processing_age_version])
 
 AC_PROG_CXX
 #AC_PROG_INSTALL
