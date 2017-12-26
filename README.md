@@ -52,23 +52,30 @@ The second step fuses all output nuclear processes together so that fusion doesn
 ## setup
 
 To setup, clone then run :
+```
 git submodule init
 git submodule update
 ./tools/autotools.sh
 ./configure
 make
-
+```
 ## To run the ALSA example
 
 Ensure you have the libasound2 and eigen3 development packages installed - then execute the configure and make from the setup section to build the ALSA plugin.
 Once built, find where your alsa plugins are on your system :
+```
 find /usr/lib* -name '*libasound_module_pcm*'
+```
 
 Say it tells you that they are located in the /usr/lib/x86_64-linux-gnu/alsa-lib/ directory, then link the built plugin to there :
+```
 sudo ln -s `pwd`/ALSAExample/.libs/libasound_module_pcm_NuclearALSAExtPluginTest.so /usr/lib/x86_64-linux-gnu/alsa-lib
+```
 
 You can run the ALSA plugin with a command similar to the following :
+```
 aplay -Dnp yourFile.wav
+```
 
 You will need to setup your .asoundrc file similar to the following example - it uses the lfloat pcm plugins to ensure we are processing floating point in and out in our plugin :
 ```
