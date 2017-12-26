@@ -1,7 +1,9 @@
 # nuclear-processing
 Lockless, ordered, threaded, parallel chain reaction processing.
-![Chain reaction - fission](https://upload.wikimedia.org/wikipedia/commons/f/f0/Nuclear_fission_chain_reaction.svg "fission chain reaction")
-![Chain reaction - fusion](https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Fusion_in_the_Sun.svg/421px-Fusion_in_the_Sun.svg.png "fusion chain reaction")
+
+Fission|Fusion
+--- | --- 
+![Chain reaction - fission](https://upload.wikimedia.org/wikipedia/commons/f/f0/Nuclear_fission_chain_reaction.svg "fission chain reaction") | ![Chain reaction - fusion](https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Fusion_in_the_Sun.svg/421px-Fusion_in_the_Sun.svg.png "fusion chain reaction")
 
 ## What is nuclear processing ?
 
@@ -24,11 +26,13 @@ Each Atom waits for the prior atom in the chain reaction (the chain atom) to com
 executes the process which most likely begins with a memory copy and then computation if necessary. On completion, it signals the next atoms
 up the chain to begin processing.
 
-The Atom uses a ThreadedMethod for performing the wait, process and wake loop. A Futex is used for waiting and waking.
+The Fission class (process) uses a ThreadedMethod for performing the wait, process and wake loop. A Futex is used for waiting and waking.
 
 ### How can I think of the fusion system ?
 
 A simple example is that a previous set of atomic Fission (or Fusion) reactions have completed. The atoms which result from this fission or fusion process combine and fuse into one process.
+
+The Fusion class uses a Futex and atomic operations for signalling that multiple prior atomic processes have successfully fused.
 
 ## Examples
 
