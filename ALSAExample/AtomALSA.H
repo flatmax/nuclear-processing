@@ -29,12 +29,12 @@
 #ifndef ATOMALSA_H_
 #define ATOMALSA_H_
 
-#include "Atom.H"
+#include "Fission.H"
 
 /** This class does no processing. It inherits an Eigen column which will hold
 its output data after processing.
 */
-class AtomALSA : public Atom, public Eigen::Matrix<float, Eigen::Dynamic, 1> {
+class AtomALSA : public Fission, public Eigen::Matrix<float, Eigen::Dynamic, 1> {
   /** This default process does nothing, assumes that audio data is manually
   placed into the output Eigen column by a different thread.
   */
@@ -66,7 +66,7 @@ class AtomALSAOut : public AtomALSA {
     // printf("AtomALSAOut::process : rows in =%ld cols in =%ld\n",dynamic_cast<AtomALSA *>(chainAtom)->rows(), dynamic_cast<AtomALSA *>(chainAtom)->cols());
     // printf("AtomALSAOut::process : rows out =%ld cols out =%ld this ch = %d\n",out.col(ch).rows(),out.cols(), ch);
     if (dstAddr)
-      out.col(ch)=*dynamic_cast<AtomALSA *>(chainAtom);
+      out.col(ch)=*dynamic_cast<AtomALSA *>(chainReaction);
     return 0;
   }
 

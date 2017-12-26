@@ -120,9 +120,9 @@ public:
 
 		// chain input to output atoms, according to the minimum number.
 		for (int i=0;i<::min(extplug.channels, extplug.slave_channels);i++){
-			inChannels[i].setChainAtom(&startTrigger); // the input lattice is triggered from one atom's Futex
+			inChannels[i].setChainReaction(&startTrigger); // the input lattice is triggered from one atom's Futex
 			inChannels[i].resize(getPeriodSize(), 1);
-			outChannels[i].setChainAtom(&inChannels[i]);
+			outChannels[i].setChainReaction(&inChannels[i]);
 			outChannels[i].setChannel(i);
 			outChannels[i].resize(getPeriodSize(), 1);
 		}
