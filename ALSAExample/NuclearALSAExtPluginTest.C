@@ -71,7 +71,7 @@ The entire process is like so :
 * - Secondly :
 * -- wakes the startTrigger atom, which performs an process then wakes all atoms in the waiting lattice (layer)
 */
-class NeutronBombALSAExtPluginTest : public ALSAExternalPlugin {
+class NuclearALSAExtPluginTest : public ALSAExternalPlugin {
 		snd_pcm_format_t inFormat;
 		snd_pcm_format_t outFormat;
 
@@ -80,12 +80,12 @@ class NeutronBombALSAExtPluginTest : public ALSAExternalPlugin {
 		NuclearALSA startTrigger; ///< This atom triggers the input lattice
 
 public:
-	NeutronBombALSAExtPluginTest(){
+	NuclearALSAExtPluginTest(){
     	std::cout<<__func__<<std::endl;
-		setName("NeutronBombALSAExtPluginTest");
+		setName("NuclearALSAExtPluginTest");
 	}
 
-	// virtual ~NeutronBombALSAExtPluginTest(){
+	// virtual ~NuclearALSAExtPluginTest(){
   //   	std::cout<<__func__<<std::endl;
 	// }
 
@@ -174,8 +174,8 @@ public:
 	}
 };
 
-NeutronBombALSAExtPluginTest nBEPlugin;
-extern "C" SND_PCM_PLUGIN_DEFINE_FUNC(NeutronBombALSAExtPluginTest){
+NuclearALSAExtPluginTest nBEPlugin;
+extern "C" SND_PCM_PLUGIN_DEFINE_FUNC(NuclearALSAExtPluginTest){
 	std::cout<<__func__<<std::endl;
     nBEPlugin.parseConfig(name, conf, stream, mode);
 
@@ -190,4 +190,4 @@ extern "C" SND_PCM_PLUGIN_DEFINE_FUNC(NeutronBombALSAExtPluginTest){
     return 0;
 }
 
-SND_PCM_PLUGIN_SYMBOL(NeutronBombALSAExtPluginTest);
+SND_PCM_PLUGIN_SYMBOL(NuclearALSAExtPluginTest);

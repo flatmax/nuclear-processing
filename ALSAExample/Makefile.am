@@ -28,10 +28,10 @@
 
 if HAVE_ALSA
 if HAVE_EIGEN
-pkglib_LTLIBRARIES = libasound_module_pcm_NeutronBombALSAExtPluginTest.la
+pkglib_LTLIBRARIES = libasound_module_pcm_NuclearALSAExtPluginTest.la
 endif
 endif
 
-libasound_module_pcm_NeutronBombALSAExtPluginTest_la_SOURCES = NeutronBombALSAExtPluginTest.C
-libasound_module_pcm_NeutronBombALSAExtPluginTest_la_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/gtkiostream/include $(EIGEN_CFLAGS)
-libasound_module_pcm_NeutronBombALSAExtPluginTest_la_LDFLAGS = -module -avoid-version -export-dynamic -no-undefined
+libasound_module_pcm_NuclearALSAExtPluginTest_la_SOURCES = NuclearALSAExtPluginTest.C
+libasound_module_pcm_NuclearALSAExtPluginTest_la_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/gtkiostream/include $(EIGEN_CFLAGS)
+libasound_module_pcm_NuclearALSAExtPluginTest_la_LDFLAGS = -module -avoid-version -export-dynamic -no-undefined
