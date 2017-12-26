@@ -46,7 +46,9 @@ class NuclearALSA : public Fission, public Eigen::Matrix<float, Eigen::Dynamic, 
   }
 };
 
-/** Class to act as output data layer
+/** Class to act as output data layer.
+Its job is to copy the previous atomic process's data (chainReaction) into the
+ALSA output audio buffer. This happens in the process method.
 */
 class NuclearALSAOut : public NuclearALSA {
   unsigned int ch; ///< The channel in the out matrix
@@ -59,15 +61,15 @@ class NuclearALSAOut : public NuclearALSA {
   \return 0
   */
   virtual int process(){
+    if (!dstAddr) // if we don't have a destination data address, exit early
+      return 0;
+
     /// The ALSA output matrix - we are col(ch) in this matrix
     Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic> stride(1,chCnt);
     Eigen::Map<Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic>, Eigen::Unaligned, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic> >
                                             out(dstAddr, size, chCnt, stride);
 
-    // printf("NuclearALSAOut::process : rows in =%ld cols in =%ld\n",dynamic_cast<NuclearALSA *>(chainNuclear)->rows(), dynamic_cast<NuclearALSA *>(chainNuclear)->cols());
-    // printf("NuclearALSAOut::process : rows out =%ld cols out =%ld this ch = %d\n",out.col(ch).rows(),out.cols(), ch);
-    if (dstAddr)
-      out.col(ch)=*dynamic_cast<NuclearALSA *>(chainReaction);
+    out.col(ch)=*dynamic_cast<NuclearALSA *>(chainReaction);
     return 0;
   }
 
@@ -85,6 +87,11 @@ public:
     ch=whichCh;
   }
 
+  /** Assign the ALSA output parameters for setting up the destination data buffer.
+  \param dstAddrIn Is the destination address pointer, the start of the ALSA output audio buffer.
+  \param sizeIn is the size of the ALSA buffer
+  \param chCntIn is the number of output channels addressed by the output audio buffer.
+  */
   void assignOutParam(float *dstAddrIn, snd_pcm_uframes_t sizeIn, unsigned int chCntIn){
     dstAddr=dstAddrIn;
     size=sizeIn;
@@ -92,6 +99,9 @@ public:
   }
 };
 
+/** This Fusion process is used to wait until all of the NuclearALSAOut fission processes
+have completed. Once complete, we can release the ALSA processing thread to continue.
+*/
 class FuseALSA : public Fusion {
   // An empty process
   virtual int process(){return 0;}
