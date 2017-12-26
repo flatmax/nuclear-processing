@@ -1,4 +1,4 @@
-// Copyright (c) 2017 The neutron bomb processing Authors. All rights reserved.
+// Copyright (c) 2017 The nuclear processing Authors. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -93,8 +93,6 @@ public:
     chainReaction=NULL;
   }
 
-  // virtual ~Fission(){} ///< Destructor
-
   /** Process the data.
   Here you implement your process method which copies data as required from the
   chainReaction. Once you have finished computing, return <0 on error, >=0 otherwise
@@ -110,5 +108,4 @@ public:
     chainReaction=chain;
   }
 };
-
 #endif // FISSION_H_

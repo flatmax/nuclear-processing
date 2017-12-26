@@ -2,7 +2,7 @@
 Lockless, ordered, threaded, parallel chain reaction processing.
 ![Chain reaction](https://upload.wikimedia.org/wikipedia/commons/f/f0/Nuclear_fission_chain_reaction.svg "uranium chain reaction")
 
-## What is neutron bomb processing ?
+## What is nuclear processing ?
 
 A processing methodology where one process triggers many different processes to start. It can be set up like a chain reaction,
 where multiple processes can trigger multiple subsequent processes.
