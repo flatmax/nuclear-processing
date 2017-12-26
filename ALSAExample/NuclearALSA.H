@@ -26,20 +26,20 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef ATOMALSA_H_
-#define ATOMALSA_H_
+#ifndef NUCLEARALSA_H_
+#define NUCLEARALSA_H_
 
 #include "Fission.H"
 
 /** This class does no processing. It inherits an Eigen column which will hold
 its output data after processing.
 */
-class AtomALSA : public Fission, public Eigen::Matrix<float, Eigen::Dynamic, 1> {
+class NuclearALSA : public Fission, public Eigen::Matrix<float, Eigen::Dynamic, 1> {
   /** This default process does nothing, assumes that audio data is manually
   placed into the output Eigen column by a different thread.
   */
   virtual int process(){
-    // printf("AtomALSA::process : rows in =%ld cols in =%ld\n",this->rows(), this->cols());
+    // printf("NuclearALSA::process : rows in =%ld cols in =%ld\n",this->rows(), this->cols());
     // printf("%f\n",maxCoeff());
     return 0;
   }
@@ -47,7 +47,7 @@ class AtomALSA : public Fission, public Eigen::Matrix<float, Eigen::Dynamic, 1> 
 
 /** Class to act as output data layer
 */
-class AtomALSAOut : public AtomALSA {
+class NuclearALSAOut : public NuclearALSA {
   unsigned int ch; ///< The channel in the out matrix
   unsigned int chCnt; ///< The slave's channel count
 
@@ -63,10 +63,10 @@ class AtomALSAOut : public AtomALSA {
     Eigen::Map<Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic>, Eigen::Unaligned, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic> >
                                             out(dstAddr, size, chCnt, stride);
 
-    // printf("AtomALSAOut::process : rows in =%ld cols in =%ld\n",dynamic_cast<AtomALSA *>(chainAtom)->rows(), dynamic_cast<AtomALSA *>(chainAtom)->cols());
-    // printf("AtomALSAOut::process : rows out =%ld cols out =%ld this ch = %d\n",out.col(ch).rows(),out.cols(), ch);
+    // printf("NuclearALSAOut::process : rows in =%ld cols in =%ld\n",dynamic_cast<NuclearALSA *>(chainNuclear)->rows(), dynamic_cast<NuclearALSA *>(chainNuclear)->cols());
+    // printf("NuclearALSAOut::process : rows out =%ld cols out =%ld this ch = %d\n",out.col(ch).rows(),out.cols(), ch);
     if (dstAddr)
-      out.col(ch)=*dynamic_cast<AtomALSA *>(chainReaction);
+      out.col(ch)=*dynamic_cast<NuclearALSA *>(chainReaction);
     return 0;
   }
 
@@ -74,7 +74,7 @@ public:
 
   /** Constructor, start with out as NULL
   */
-  AtomALSAOut(){
+  NuclearALSAOut(){
     dstAddr=NULL;
   }
 
@@ -90,4 +90,4 @@ public:
     chCnt=chCntIn;
   }
 };
-#endif //ATOMALSA_H_
+#endif //NUCLEARALSA_H_

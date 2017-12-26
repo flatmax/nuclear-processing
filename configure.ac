@@ -32,7 +32,7 @@ m4_define([neutron_bomb_processing_version], [neutron_bomb_processing_current_ve
 
 AC_INIT( neutron_bomb_processing, [neutron_bomb_processing_version], [ https://github.com/flatmax/neutron_bomb_processing/issues ])
 AM_INIT_AUTOMAKE
-AC_CONFIG_SRCDIR([include/Atom.H])
+AC_CONFIG_SRCDIR([include/Fission.H])
 AC_CONFIG_SRCDIR([gtkiostream/include/Futex.H])
 AC_CONFIG_SRCDIR([gtkiostream/include/Thread.H])
 AC_CONFIG_HEADERS([config.h])

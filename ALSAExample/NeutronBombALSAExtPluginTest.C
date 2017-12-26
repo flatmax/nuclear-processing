@@ -30,10 +30,10 @@
 using namespace std;
 using namespace ALSA;
 
-#include "AtomALSA.H"
+#include "NuclearALSA.H"
 
 /** This class uses neutron-bomb-processing to execute lattice by lattice in parallel threads.
-The implementation uses the AtomALSA and AtomALSAOut classes, but is more elaborate then required.
+The implementation uses the NuclearALSA and NuclearALSAOut classes, but is more elaborate then required.
 The extra elaboration shows how to chain multiple atom lattices (layers) together.
 
 The processing is very simple. The input lattice (atom layer) is chained to one start trigger
@@ -44,7 +44,7 @@ lattice over to the ALSA output audio buffer.
 In this way, an elaborate method for copying the input ALSA audio data directly
 to the ALSA output audio is performed through two lattices (atom layers).
 
-Other implementations can implement signal processing in each of their layer's Atom::process methods to
+Other implementations can implement signal processing in each of their layer's Fission::process methods to
 do something more significant in a signal processing chain reaction !
 
 The ::init method sets up the neutron-bomb-processing system.
@@ -54,7 +54,7 @@ It chains all of the atoms in the input lattice to the startTrigger atom.
 It chains each output atom to a single input atom and sets its channels number.
 It then starts the thread for all relevant input and output lattices.
 
-The Futex of one Atom (the startTrigger) triggers the inChannels lattice to process.
+The Futex of one Fission (the startTrigger) triggers the inChannels lattice to process.
 Upon completion of the iChannels, the outChannels a triggered to execute.
 The inChannels do nothing ! But their process methods could implement some form of processing.
 The ALSA in data is copied directly to the inChannels during setup in the transfer method.
@@ -75,9 +75,9 @@ class NeutronBombALSAExtPluginTest : public ALSAExternalPlugin {
 		snd_pcm_format_t inFormat;
 		snd_pcm_format_t outFormat;
 
-		vector<AtomALSA> inChannels; ///< The input data lattice
-		vector<AtomALSAOut> outChannels; ///< The output data lattice
-		AtomALSA startTrigger; ///< This atom triggers the input lattice
+		vector<NuclearALSA> inChannels; ///< The input data lattice
+		vector<NuclearALSAOut> outChannels; ///< The output data lattice
+		NuclearALSA startTrigger; ///< This atom triggers the input lattice
 
 public:
 	NeutronBombALSAExtPluginTest(){
