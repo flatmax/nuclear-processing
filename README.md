@@ -1,13 +1,13 @@
-# neutron-bomb-processing
+# nuclear-processing
 Lockless, ordered, threaded, parallel chain reaction processing.
-![Chain reaction](https://upload.wikimedia.org/wikipedia/commons/f/f0/Nuclear_fission_chain_reaction.svg "uranium chain reaction")
+![Chain reaction - fission](https://upload.wikimedia.org/wikipedia/commons/f/f0/Nuclear_fission_chain_reaction.svg "fission chain reaction")
+![Chain reaction - fusion](https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Fusion_in_the_Sun.svg/421px-Fusion_in_the_Sun.svg.png "fusion chain reaction")
 
 ## What is nuclear processing ?
 
-A processing methodology where one process triggers many different processes to start. It can be set up like a chain reaction,
-where multiple processes can trigger multiple subsequent processes.
+A processing methodology where either one process triggers many different processes to start or many processes complete triggering one process to start. It can be set up like a fission chain reaction, where multiple processes can trigger multiple subsequent processes. It can also be set up like a fusion chain reaction, where multiple processes can complete and fuse into one process. Fusion and fission processes can be arbirarily and sequentially ordered.
 
-In the context of this project, fission processing has the following properties :
+In the context of this project, fission and fusion processing have the following properties :
 * lockless
 * parallel
 * ordered
@@ -16,13 +16,32 @@ In the context of this project, fission processing has the following properties 
 
 ## How can I think of it ?
 
-Think of a chain reaction explosion where Uranium 235 triggers many other uranium atoms to split. One path of fission is dependent on only only prior computations in the fission chain. Computation is independent of other fission chains.
+### How can I think of the fission system ?
+
+Think of a fission chain reaction explosion where Uranium 235 triggers many other uranium atoms to split. One path of fission is dependent on only only prior computations in the fission chain. Computation is independent of other fission chains.
 
 Each Atom waits for the prior atom in the chain reaction (the chain atom) to complete processing and signal it's completion. The Atom then
 executes the process which most likely begins with a memory copy and then computation if necessary. On completion, it signals the next atoms
 up the chain to begin processing.
 
 The Atom uses a ThreadedMethod for performing the wait, process and wake loop. A Futex is used for waiting and waking.
+
+### How can I think of the fusion system ?
+
+A simple example is that a previous set of atomic Fission (or Fusion) reactions have completed. The atoms which result from this fission or fusion process combine and fuse into one process.
+
+## Examples
+
+This repository has examples.
+
+### ALSA audio processing examples
+
+#### Nuclear ALSA processing
+
+In the ALSAExample/NuclearALSAExtPluginTest.C file, an external ALSA plugin is created which gives an example of combining both nuclear fission and then nuclear fusion to process audio.
+
+The first step breaks all input channels into seperate processing threads. The first atomic lattice of fission processing copies the input audio data into Eigen matrix columns. These atoms have an empty process which trigger the next fission process, where the audio data is copied to the ALSA output buffer.
+The second step fuses all output nuclear processes together so that fusion doesn't occur until all output channels have been processed. Once fusion is complete, the process has ended and execution is passed back to the Kernel ALSA subsystem.
 
 ## A history of loop fission computation
 
