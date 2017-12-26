@@ -32,6 +32,8 @@
 #include <Thread.H>
 #include <Futex.H>
 
+#include "Fusion.H"
+
 /** Atomic Fission is one of the basic units of computation. Fission inherits a
 <a href="http://gtkiostream.flatmax.org/classFutex.html">Futex</a> for waking
 other atomic processes down the chain reaction after computing. Fission inherits a
@@ -78,12 +80,15 @@ class Fission : public Futex, public ThreadedMethod {
       if (process()<0) // process
         break;
       wakeAll(); // Wake all of the atomic reactions waiting on this process to complete.
+      if (inFusion) // If we are part of a fusion reaction, indicate completion here
+        inFusion->fuse();
     }
     return NULL;
   }
 
 protected:
   Fission *chainReaction; ///< The prior atomic reaction in the chain reaction
+  Fusion *inFusion; ///< If necessary, this atom will become part of a fusion rection once processed
 
 public:
   /** Constructor
@@ -91,6 +96,7 @@ public:
   */
   Fission(){
     chainReaction=NULL;
+    inFusion=NULL;
   }
 
   /** Process the data.
@@ -106,6 +112,13 @@ public:
   */
   void setChainReaction(Fission *chain){
     chainReaction=chain;
+  }
+
+  /** Add the fusion reaction which this atom will be part of upon completing process.
+  \param f The Fusion atomic process
+  */
+  void setFusionReaction(Fusion *f){
+    inFusion=f;
   }
 };
 #endif // FISSION_H_

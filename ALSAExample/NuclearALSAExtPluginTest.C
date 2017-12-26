@@ -78,16 +78,13 @@ class NuclearALSAExtPluginTest : public ALSAExternalPlugin {
 		vector<NuclearALSA> inChannels; ///< The input data lattice
 		vector<NuclearALSAOut> outChannels; ///< The output data lattice
 		NuclearALSA startTrigger; ///< This atom triggers the input lattice
+		FuseALSA waitTrigger; ///< Wait for all outputs to finish with this Fusion process
 
 public:
 	NuclearALSAExtPluginTest(){
     	std::cout<<__func__<<std::endl;
 		setName("NuclearALSAExtPluginTest");
 	}
-
-	// virtual ~NuclearALSAExtPluginTest(){
-  //   	std::cout<<__func__<<std::endl;
-	// }
 
 	virtual int specifyHWParams(){
 		int ret;
@@ -121,10 +118,11 @@ public:
 		// chain input to output atoms, according to the minimum number.
 		for (int i=0;i<::min(extplug.channels, extplug.slave_channels);i++){
 			inChannels[i].setChainReaction(&startTrigger); // the input lattice is triggered from one atom's Futex
-			inChannels[i].resize(getPeriodSize(), 1);
-			outChannels[i].setChainReaction(&inChannels[i]);
-			outChannels[i].setChannel(i);
-			outChannels[i].resize(getPeriodSize(), 1);
+			inChannels[i].resize(getPeriodSize(), 1); // Set the data size
+			outChannels[i].setChainReaction(&inChannels[i]); // add the atomic process to wait on
+			outChannels[i].setFusionReaction(&waitTrigger); // add to the output fusion reaction
+			outChannels[i].setChannel(i); // set the channel for this output Fusion reaction
+			outChannels[i].resize(getPeriodSize(), 1); // Set the data size
 		}
 
 		// create/run threads, guarding against failure
@@ -155,11 +153,8 @@ public:
 		Eigen::Map<Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic>, Eigen::Unaligned, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic> >
 																						out(dstAddr, size, slaveCh, strideSlave);
 
-		// printf("\ntransfer : in rows=%ld cols=%ld\n", in.rows(), in.cols());
-		// printf("\ntransfer : out rows=%ld cols=%ld\n", out.rows(), out.cols());
-		// printf("\n\ntransfer %f\n",in.col(0).maxCoeff());
-
 		// initial setup
+		waitTrigger.setFusionAtomCount(::min(extplug.channels, extplug.slave_channels)); // we will only process this many channels
     out.setZero();
     ch=::min(ch, slaveCh); // copy only the smallest channel count over
 		for (int i=0; i<ch; i++){
@@ -169,7 +164,7 @@ public:
 
 		// begin execution
 		startTrigger.wakeAll();
-		// sleep(0.03);
+		waitTrigger.waitFused(); // Wait for all output processes to fuse
   	return size;
 	}
 };

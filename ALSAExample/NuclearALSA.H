@@ -30,6 +30,7 @@
 #define NUCLEARALSA_H_
 
 #include "Fission.H"
+#include "Fusion.H"
 
 /** This class does no processing. It inherits an Eigen column which will hold
 its output data after processing.
@@ -89,5 +90,10 @@ public:
     size=sizeIn;
     chCnt=chCntIn;
   }
+};
+
+class FuseALSA : public Fusion {
+  // An empty process
+  virtual int process(){return 0;}
 };
 #endif //NUCLEARALSA_H_
