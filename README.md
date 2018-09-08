@@ -1,4 +1,7 @@
 # nuclear-processing
+
+An implementation of a [concurrency pattern](https://en.wikipedia.org/wiki/Concurrency_pattern) bsaed on nuclear reactions. [Nuclear processing](https://en.wikipedia.org/wiki/Nuclear_computation) takes advantage of threading abilities of modern multi-core processors where the trend is to increase their hardware ability to compute more threads then their earlier generation processors.
+
 Lockless, ordered, threaded, parallel chain reaction processing.
 
 See later in this document for setup, bulding and running examples
