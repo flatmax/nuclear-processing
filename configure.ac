@@ -81,8 +81,8 @@ fi
 AC_C_INLINE
 AC_FUNC_ERROR_AT_LINE
 
-AC_CONFIG_FILES([Makefile api/Makefile ALSAExample/Makefile])
-AC_OUTPUT
+AC_CONFIG_FILES([Makefile include/Makefile api/Makefile ALSAExample/Makefile])
+AC_OUTPUT(nuclear.pc)
 
 AM_COND_IF(HAVE_EIGEN, [AC_MSG_NOTICE([Eigen   ....................................... Present])], [AC_MSG_NOTICE([Eigen   ......................................... Not present
 Eigen tests and applications will not be built.])])

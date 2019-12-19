@@ -35,3 +35,6 @@ endif
 libasound_module_pcm_NuclearALSAExtPluginTest_la_SOURCES = NuclearALSAExtPluginTest.C
 libasound_module_pcm_NuclearALSAExtPluginTest_la_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/gtkiostream/include $(EIGEN_CFLAGS)
 libasound_module_pcm_NuclearALSAExtPluginTest_la_LDFLAGS = -module -avoid-version -export-dynamic -no-undefined
+
+otherincludedir = $(includedir)/nuclear
+otherinclude_HEADERS = NuclearALSA.H

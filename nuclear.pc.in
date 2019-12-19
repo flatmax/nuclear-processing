@@ -1,0 +1,13 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: nuclear
+Description: An implementation of a concurrency pattern based on nuclear reactions.
+URL: https://github.com/flatmax/nuclear-processing
+Version: @VERSION@
+Requires:
+Libs: -L${libdir} @ALSA_LIBS@ @EIGEN_LIBS@
+Cflags: @ALSA_CFLAGS@ @EIGEN_CFLAGS@
+Libs.private:

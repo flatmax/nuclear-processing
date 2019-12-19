@@ -26,12 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-AUTOMAKE_OPTIONS = foreign subdir-objects
-SUBDIRS = include api ALSAExample
 
-ACLOCAL_AMFLAGS = -I m4
+otherincludedir = $(includedir)/nuclear
 
-pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = nuclear.pc
-
-EXTRA_DIST = README.md LICENSE.txt
+otherinclude_HEADERS = Fission.H Fusion.H
