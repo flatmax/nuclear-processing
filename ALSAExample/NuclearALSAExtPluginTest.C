@@ -131,9 +131,9 @@ public:
 		for (int i=0;i<::min(extplug.channels, extplug.slave_channels);i++){
 			ret=inChannels[i].run();
 			if (!ret)
-			ret=outChannels[i].run();
+				ret=outChannels[i].run();
 			if (ret)
-			break;
+				break;
 		}
 		if (ret) // if any threads didn't create successfully, stop all threads
 			for (int i=0;i<::min(extplug.channels, extplug.slave_channels);i++){
