@@ -32,4 +32,5 @@ make distclean
 rm -rf autom4te.cache aclocal.m4 m4 missing config.sub COPYING config.guess configure depcomp install-sh config.h.in ltmain.sh   Makefile.in src/Makefile.in test/Makefile.in INSTALL api/Makefile.in .deps compile
 find . -name '*~' | xargs rm -f
 find . -name 'octave-core' | xargs rm -f
+rm -rf gtkiostream/* gtkiostream/.git gtkiostream/.gitignore
 #rm -rf config.log config.h Makefile
