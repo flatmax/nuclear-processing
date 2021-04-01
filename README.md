@@ -58,7 +58,7 @@ To setup, clone then run :
 ```
 git submodule init
 git submodule update
-./tools/autotools.sh
+./autogen.sh
 ./configure
 make
 ```
